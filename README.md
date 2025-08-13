@@ -1,74 +1,80 @@
-News Scraper Portal
+# News Scraper Portal
+
 A simple app to log in with Google OAuth 2.0 and view news headlines from BBC News. Uses React with Vite for the frontend and Spring Boot for the backend.
-Features
 
-Google OAuth 2.0 login.
-Scrapes news titles and details from BBC News.
-Responsive card-based UI with a refresh button.
+## Features
 
-Tech Used
+- Google OAuth 2.0 login.
+- Scrapes news titles and details from BBC News.
+- Responsive card-based UI with a refresh button.
 
-Frontend: React with Vite.
-Backend: Spring Boot (with Jsoup for scraping).
+## Tech Used
 
-Setup Instructions
-1. Unzip the Project
+- Frontend: React with Vite.
+- Backend: Spring Boot (with Jsoup for scraping).
 
-Unzip the react-scraper-portal.zip file to a folder (e.g., react-scraper-portal).
+## Setup Instructions (Command-Line Style)
 
-2. Set Up Google OAuth
+### 1. Unzip the Project
 
-Go to Google Cloud Console.
-Create a project (e.g., "News Scraper").
-Go to APIs & Services > Credentials.
-Create an OAuth 2.0 Client ID:
-Application type: Web application
-Authorized JavaScript origins: http://localhost:3000
-Authorized redirect URIs: http://localhost:3000
+# Unzip the project zip file
+unzip react-scraper-portal.zip -d react-scraper-portal
+cd react-scraper-portal
 
-
-Copy the Client ID.
-Open scraper-frontend/src/App.jsx in VS Code.
-Find the line with googleClientId (e.g., const googleClientId = "paste-here";) and paste your Client ID there. Save the file.
-
-3. Set Up the Frontend
-
-Open the scraper-frontend folder in VS Code.
-Install dependencies by running this in the terminal:npm install
+# Go to Google Cloud Console
+# Create a project named "News Scraper"
+# Go to APIs & Services > Credentials
+# Create OAuth 2.0 Client ID:
+#   Application type: Web application
+#   Authorized JavaScript origins: http://localhost:3000
+#   Authorized redirect URIs: http://localhost:3000
+# Copy the Client ID
 
 
-Start the app:npm run dev
 
 
-Open http://localhost:3000 in your browser.
+# Open App.jsx to add your Client ID
+# Edit scraper-frontend/src/App.jsx
+# Replace: const googleClientId = "paste-here";
+# With your Client ID and save
 
-4. Set Up the Backend
 
-Open the scraper folder in Spring Tool Suite (STS) or any IDE.
-Check pom.xml to ensure all dependencies are there (no changes needed, just review).
-Update src/main/resources/application.properties with:spring.application.name=scraper
+
+cd scraper-frontend
+npm install
+npm run dev
+# Open browser at http://localhost:3000
+
+
+cd ../scraper
+# Check pom.xml for dependencies
+# Edit application.properties
+echo "
+spring.application.name=scraper
 server.port=8080
 spring.security.oauth2.resourceserver.jwt.issuer-uri=https://accounts.google.com
 spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://www.googleapis.com/oauth2/v3/certs
+" > src/main/resources/application.properties
 
 
-Run the Spring Boot app:
-In STS: Right-click project > Run As > Spring Boot App.
+
+# Run Spring Boot app
+# Using Maven:
+mvn spring-boot:run
+# OR using IDE: Right-click > Run As > Spring Boot App
+# Backend runs at http://localhost:8080
 
 
-Backend runs on http://localhost:8080.
 
-5. How It Works
+# Open frontend in browser
+# Click "Login with Google"
+# View news headlines
+# Use refresh button to update
 
-Click "Login with Google" to log in.
-See news headlines in cards.
-Use the refresh button to update data.
 
-6. Troubleshooting
-
-Login Fails: Check the Client ID in App.jsx.
-No News: Ensure backend is running on http://localhost:8080.
-CORS Error: Should work automatically with frontend.
+# Login Fails: Check Client ID in App.jsx
+# No News: Ensure backend is running on http://localhost:8080
+# CORS Error: Should work automatically
 
 
 
