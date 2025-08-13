@@ -1,0 +1,14 @@
+package scraperService;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class ScraperService {
+
+	public List<Map<String,String>> scrapeCryptoPrices(){
+		
+	}
+
+}

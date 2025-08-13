@@ -1,0 +1,18 @@
+package scraperController;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import scraperService.ScraperService;
+
+@CrossOrigin(origins="http://localhost:5173/")
+@RestController
+public class ScrapperController {
+
+		@GetMapping("/buildings")
+		public String getTallestBuildings(){
+			return ScraperService.scrapeTallestBuildings();
+		}
+		
+}

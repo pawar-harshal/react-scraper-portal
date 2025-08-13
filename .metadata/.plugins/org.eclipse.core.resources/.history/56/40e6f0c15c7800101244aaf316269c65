@@ -1,0 +1,64 @@
+package com.example.scraper.scraperService;
+
+import java.io.IOException;
+import java.util.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+public class ScraperService {
+
+    public static String scrapeTopMovies() {
+        List<Map<String, String>> movies = new ArrayList<>();
+
+        try {
+            // IMDb Top 250 movies page
+            Document doc = Jsoup.connect("https://www.imdb.com/chart/top/")
+                                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                                .get();
+
+            Elements rows = doc.select("table.chart.full-width tbody tr");
+
+            for (Element row : rows) {
+                Map<String, String> movie = new HashMap<>();
+
+                // Rank
+                String rankText = row.select(".titleColumn").text().split("\\.")[0].trim();
+                movie.put("rank", rankText);
+
+                // Title
+                String title = row.select(".titleColumn a").text().trim();
+                movie.put("title", title);
+
+                // Year
+                String year = row.select(".titleColumn span.secondaryInfo")
+                                 .text().replace("(", "").replace(")", "").trim();
+                movie.put("year", year);
+
+                // IMDb Rating
+                String rating = row.select(".imdbRating strong").text().trim();
+                movie.put("rating", rating);
+
+                // Movie URL
+                String url = "https://www.imdb.com" + row.select(".titleColumn a").attr("href").trim();
+                movie.put("url", url);
+
+                // Poster image
+                Element poster = row.select("td.posterColumn img").first();
+                movie.put("poster", poster != null ? poster.attr("src") : "");
+
+                movies.add(movie);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(movies);
+    }
+}

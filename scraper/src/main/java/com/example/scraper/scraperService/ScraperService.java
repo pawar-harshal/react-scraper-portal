@@ -1,0 +1,76 @@
+package com.example.scraper.scraperService;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+public class ScraperService {
+
+    public static List<Map<String, String>> scrapeNews() {
+        List<Map<String, String>> newsData = new ArrayList<>();
+        String url = "https://www.bbc.com/news";
+
+        try {
+            Document doc = Jsoup.connect(url)
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                    .referrer("http://www.google.com")
+                    .get();
+
+            // Select the specific news section
+            Element section = doc.selectFirst("section[data-testid=virginia-section-outer-8]");
+            if (section == null) {
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "News section not found");
+                newsData.add(error);
+                return newsData;
+            }
+
+            // Select all news cards
+            Elements cards = section.select("[data-testid$=card]");
+            for (Element card : cards) {
+                Map<String, String> article = new HashMap<>();
+
+                // Extract link
+                Element linkEl = card.selectFirst("a");
+                article.put("link", linkEl != null ? linkEl.absUrl("href") : "N/A");
+
+                // Extract title
+                Element titleEl = card.selectFirst("[data-testid=card-headline]");
+                article.put("title", titleEl != null ? titleEl.text() : "N/A");
+
+                // Extract description
+                Element descEl = card.selectFirst("[data-testid=card-description]");
+                article.put("description", descEl != null ? descEl.text() : "N/A");
+
+            
+
+                // Extract metadata (time and category)
+                Element timeEl = card.selectFirst("[data-testid=card-metadata-lastupdated]");
+                article.put("time", timeEl != null ? timeEl.text() : "N/A");
+
+                Element categoryEl = card.selectFirst("[data-testid=card-metadata-tag]");
+                article.put("category", categoryEl != null ? categoryEl.text() : "N/A");
+
+                // Check if it's a live article
+                Element liveEl = card.selectFirst("[data-testid=live-icon-svg-styled]");
+                article.put("isLive", String.valueOf(liveEl != null));
+
+                newsData.add(article);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Failed to fetch news data");
+            newsData.add(error);
+        }
+
+        return newsData;
+    }
+}

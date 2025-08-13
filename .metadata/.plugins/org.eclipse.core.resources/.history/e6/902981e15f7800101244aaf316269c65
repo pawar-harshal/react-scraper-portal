@@ -1,0 +1,78 @@
+package com.example.scraper.scraperService;
+
+import java.io.IOException;
+import java.util.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+public class ScraperService {
+
+    // Map Indian cities to their timeanddate.com paths
+    private static final Map<String, String> CITY_PATHS = Map.of(
+        "Mumbai", "india/mumbai",
+        "Delhi", "india/new-delhi",
+        "Bangalore", "india/bengaluru",
+        "Chennai", "india/chennai",
+        "Kolkata", "india/kolkata"
+    );
+
+    public static Map<String, String> scrapeWeather(String city) {
+        Map<String, String> weatherData = new HashMap<>();
+
+        String path = CITY_PATHS.get(city);
+        if (path == null) {
+            weatherData.put("error", "City not supported");
+            return weatherData;
+        }
+
+        String url = "https://www.timeanddate.com/weather/" + path;
+
+        try {
+            Document doc = Jsoup.connect(url)
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                    .referrer("http://www.google.com")
+                    .get();
+
+            // Temperature
+            Element tempEl = doc.selectFirst("#qlook .h2");
+            weatherData.put("temperature", tempEl != null ? tempEl.text() : "N/A");
+
+            // Condition
+            Element condEl = doc.selectFirst("#qlook .small");
+            weatherData.put("condition", condEl != null ? condEl.text() : "N/A");
+
+            // Humidity
+            Element humidityEl = doc.selectFirst(".bk-focus__info table tr:contains(Humidity) td");
+            weatherData.put("humidity", humidityEl != null ? humidityEl.text() : "N/A");
+
+            // Pressure
+            Element pressureEl = doc.selectFirst(".bk-focus__info table tr:contains(Pressure) td");
+            weatherData.put("pressure", pressureEl != null ? pressureEl.text() : "N/A");
+
+            // Dew Point
+            Element dewEl = doc.selectFirst(".bk-focus__info table tr:contains(Dew Point) td");
+            weatherData.put("dew_point", dewEl != null ? dewEl.text() : "N/A");
+
+            // Visibility
+            Element visEl = doc.selectFirst(".bk-focus__info table tr:contains(Visibility) td");
+            weatherData.put("visibility", visEl != null ? visEl.text() : "N/A");
+
+            // Wind (check for both "Wind" and "Wind Speed")
+            Element windEl = doc.selectFirst(".bk-focus__info table tr:contains(Wind) td");
+            if (windEl == null) {
+                windEl = doc.selectFirst(".bk-focus__info table tr:contains(Wind Speed) td");
+            }
+            weatherData.put("wind", windEl != null ? windEl.text() : "N/A");
+
+            // City name
+            weatherData.put("city", city);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            weatherData.put("error", "Failed to fetch weather data");
+        }
+
+        return weatherData;
+    }
+}

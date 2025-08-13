@@ -1,0 +1,13 @@
+# Java / Spring Boot
+scraper/target/
+scraper/.mvn/
+scraper/*.iml
+.scraper/.idea/
+
+# Node / React
+frontend/node_modules/
+frontend/build/
+
+# OS files
+.DS_Store
+*.log

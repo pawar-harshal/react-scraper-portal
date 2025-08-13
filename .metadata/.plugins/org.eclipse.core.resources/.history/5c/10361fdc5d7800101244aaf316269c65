@@ -1,0 +1,53 @@
+package com.example.scraper.scraperService;
+
+import java.io.IOException;
+import java.util.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+public class ScraperService {
+
+    public static String scrapeWeather(String city) {
+        Map<String, String> weatherData = new HashMap<>();
+
+        try {
+            // Build URL for the city
+            String cityQuery = city.replace(" ", "+");
+            String url = "https://www.timeanddate.com/weather/?query=" + cityQuery;
+
+            Document doc = Jsoup.connect(url)
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                    .referrer("http://www.google.com")
+                    .get();
+
+            // Temperature
+            Element tempEl = doc.selectFirst(".h2"); // temperature
+            weatherData.put("temperature", tempEl != null ? tempEl.text() : "N/A");
+
+            // Condition
+            Element condEl = doc.selectFirst(".small"); // weather condition
+            weatherData.put("condition", condEl != null ? condEl.text() : "N/A");
+
+            // Humidity
+            Element humidityEl = doc.selectFirst("tr:contains(Humidity) td");
+            weatherData.put("humidity", humidityEl != null ? humidityEl.text() : "N/A");
+
+            // Wind
+            Element windEl = doc.selectFirst("tr:contains(Wind) td");
+            weatherData.put("wind", windEl != null ? windEl.text() : "N/A");
+
+            // City name
+            weatherData.put("city", city);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(weatherData);
+    }
+}
